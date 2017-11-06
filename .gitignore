@@ -3,3 +3,4 @@
 **/dist
 **/isodateparser.egg-info
 **/.idea
+**/*.pyc
