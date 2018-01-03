@@ -92,7 +92,19 @@ class ISODateParser(object):
 
     def _parseTime(self, tokens):
         self._logger.debug("Parse time: " + self._printTokensShort(tokens))
-        pass
+        state = 0
+        for token in tokens:
+            if token.type == "NUMBER":
+                if (state == 0):
+                    self._state[self._which]["hours"] = int(token.value)
+                    state += 1
+                elif (state == 1):
+                    self._state[self._which]["minutes"] = int(token.value)
+                    state += 1
+                elif (state == 2):
+                    self._state[self._which]["seconds"] = int(token.value)
+            elif token.type == "TIMEZONESIGN":
+                break # todo
 
     def _parseDuration(self, tokens):
         self._logger.debug("Parse duration: " + self._printTokensShort(tokens))

@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 from isodateparser import ISODateParser
 import logging
 
@@ -14,5 +17,5 @@ logging.basicConfig(level=logging.DEBUG)
 # 2007-03-01T13:00:00Z/P1Y2M10DT2H30M
 # P1Y2M10DT2H30M/2008-05-11T15:30:00Z
 
-parser = ISODateParser("1990-01-01T01:01:01/2017-07-07 07:07+0100")
+parser = ISODateParser("1990-01-02T03:04:05/2014-05-06 07:08+0900")
 print parser
