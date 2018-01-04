@@ -20,7 +20,8 @@ class ISODateParser(object):
                 "hours": None,
                 "minutes": None,
                 "seconds": None,
-                "milliseconds": None
+                "milliseconds": None,
+                "timezone": None
             },
             "end": {
                 "year": None,
@@ -29,7 +30,8 @@ class ISODateParser(object):
                 "hours": None,
                 "minutes": None,
                 "seconds": None,
-                "milliseconds": None
+                "milliseconds": None,
+                "timezone": None
             }
         }
         self._which = "start"
@@ -72,7 +74,7 @@ class ISODateParser(object):
             else:
                 buffer.append(token)
         if (time):
-            self._parseTime(buffer)
+            self._parseTimeTimezone(buffer)
         else:
             self._parseDate(buffer)
 
@@ -90,6 +92,21 @@ class ISODateParser(object):
                 elif (state == 2):
                     self._state[self._which]["day"] = int(token.value)
 
+    def _parseTimeTimezone(self, tokens):
+        self._logger.debug("Parse time and timezone: " + self._printTokensShort(tokens))
+        buffer = list()
+        timezone = False
+        for token in tokens:
+            if token.type == "TIMEZONESIGN" or token.type == "UTC":
+                self._parseTime(buffer)
+                timezone = True
+                buffer = list()
+            buffer.append(token)
+        if (timezone):
+            self._parseTimezone(buffer)
+        else:
+            self._parseTime(buffer)
+
     def _parseTime(self, tokens):
         self._logger.debug("Parse time: " + self._printTokensShort(tokens))
         state = 0
@@ -103,8 +120,30 @@ class ISODateParser(object):
                     state += 1
                 elif (state == 2):
                     self._state[self._which]["seconds"] = int(token.value)
-            elif token.type == "TIMEZONESIGN":
-                break # todo
+
+    def _parseTimezone(self, tokens):
+        self._logger.debug("Parse timezone: " + self._printTokensShort(tokens))
+        state = 0
+        hours = None
+        minutes = 0.0
+        sign = 1.0
+        for token in tokens:
+            if token.type == "UTC":
+                self._state[self._which]["timezone"] = 0
+            elif token.type == "TIMEZONESIGN" and token.value == "-":
+                sign = -1.0
+            elif token.type == "NUMBER":
+                if len(token.value) == 4:
+                    hours = int(token.value[0:2])
+                    minutes = int(token.value[2:4])
+                if len(token.value) == 2:
+                    if state == 0:
+                        hours = int(token.value)
+                        state += 1
+                    elif state == 1:
+                        minutes = int(token.value)
+        if hours is not None:
+            self._state[self._which]["timezone"] = sign * (hours + minutes / 60.0)
 
     def _parseDuration(self, tokens):
         self._logger.debug("Parse duration: " + self._printTokensShort(tokens))
@@ -181,3 +220,6 @@ class ISODateParser(object):
 
     def _printTokensShort(self, tokens):
         return "".join([token.value for token in tokens])
+
+    def components(self):
+        return self._state

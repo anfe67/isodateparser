@@ -18,4 +18,4 @@ logging.basicConfig(level=logging.DEBUG)
 # P1Y2M10DT2H30M/2008-05-11T15:30:00Z
 
 parser = ISODateParser("1990-01-02T03:04:05/2014-05-06 07:08+0900")
-print parser
+print parser.components()
