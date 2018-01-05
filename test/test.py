@@ -29,6 +29,28 @@ class Test(unittest.TestCase):
         self.assertEqual(result["end"]["seconds"], None)
         self.assertEqual(result["end"]["timezone"], None)
 
+    def testSimpleDateTime(self):
+        input = "1990-01-02T12:13:14"
+        result = ISODateParser(input).components
+        self.assertEqual(result["start"]["year"], 1990)
+        self.assertEqual(result["start"]["month"], 1)
+        self.assertEqual(result["start"]["day"], 2)
+        self.assertEqual(result["start"]["hours"], 12)
+        self.assertEqual(result["start"]["minutes"], 13)
+        self.assertEqual(result["start"]["seconds"], 14)
+        self.assertEqual(result["start"]["timezone"], None)
+
+    def testSimpleDateTimeSpace(self):
+        input = "1990-01-02 12:13:14"
+        result = ISODateParser(input).components
+        self.assertEqual(result["start"]["year"], 1990)
+        self.assertEqual(result["start"]["month"], 1)
+        self.assertEqual(result["start"]["day"], 2)
+        self.assertEqual(result["start"]["hours"], 12)
+        self.assertEqual(result["start"]["minutes"], 13)
+        self.assertEqual(result["start"]["seconds"], 14)
+        self.assertEqual(result["start"]["timezone"], None)
+
     def testDateRangeTimeZone(self):
         input = "1990-01-02T03:04:05/2014-05-06 07:08+0900"
         result = ISODateParser(input).components
