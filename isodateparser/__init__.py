@@ -248,10 +248,9 @@ class ISODateParser(object):
         return datetime.date(year, month, day)
 
     def _makeDates(self):
-        start = self._startDate(self.components["start"])
+        self.dates["start"] = self._startDate(self.components["start"])
         end = self._endDate(self.components["end"])
-        self.dates["start"] = start
-        self.dates["end"] = end if end is not None else start
+        self.dates["end"] = end if end is not None else self._endDate(self.components["start"])
         self.dates["mid"] = self.dates["start"] + (self.dates["end"] - self.dates["start"]) / 2
 
     def components(self):
