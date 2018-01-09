@@ -68,7 +68,8 @@ class ISODateParser(object):
                 return self._parseDateTime(tokens)
             elif token.type == "DESIGNATOR":
                 return self._parseDuration(tokens)
-        raise RuntimeError("No date separator or duration designator found")
+        # not separator, assuming year only
+        return self._parseDateTime(tokens)
 
     def _parseDateTime(self, tokens):
         self._logger.debug("Parse datetime: " + self._printTokensShort(tokens))
