@@ -147,5 +147,10 @@ class Test(unittest.TestCase):
         self.assertEqual(result["start"], datetime.date(1990, 1, 1))
         self.assertEqual(result["end"], datetime.date(1990, 1, 31))
 
+    def testBackSlash(self):
+        input = "2003-04-30T12:00\\2003-04-30T17:30"
+        with self.assertRaises(ValueError):
+            ISODateParser(input).dates
+
 if __name__ == "__main__":
     unittest.main()

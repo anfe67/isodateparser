@@ -196,7 +196,7 @@ class ISODateParser(object):
                 elif c == "\n":
                     pass
                 else:
-                    raise RuntimeError("Character " + c + " not recognized")
+                    raise ValueError("Unexpected character " + c)
 
     def _disambiguate(self):
         time = False
