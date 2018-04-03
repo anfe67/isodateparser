@@ -100,6 +100,8 @@ class ISODateParser(object):
                     state += 1
                 elif (state == 2):
                     self.components[self._which]["day"] = int(token.value)
+        if self.components[self._which]["year"] is None:
+            raise ValueError("No year in date")
 
     def _parseTimeTimezone(self, tokens):
         self._logger.debug("Parse time and timezone: " + self._printTokensShort(tokens))

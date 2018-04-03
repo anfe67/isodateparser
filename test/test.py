@@ -152,5 +152,10 @@ class Test(unittest.TestCase):
         with self.assertRaises(ValueError):
             ISODateParser(input).dates
 
+    def testDashes(self):
+        input = "--"
+        with self.assertRaises(ValueError):
+            ISODateParser(input).dates
+
 if __name__ == "__main__":
     unittest.main()
