@@ -84,6 +84,8 @@ class ISODateParser(object):
                 time = True
                 buffer = list()
             else:
+                if token.type == "TIMESEPARATOR":
+                    time = True
                 buffer.append(token)
         if (time):
             self._parseTimeTimezone(buffer)
