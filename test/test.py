@@ -157,5 +157,32 @@ class Test(unittest.TestCase):
         with self.assertRaises(ValueError):
             ISODateParser(input).dates
 
+    def testYearOmitted(self):
+        input = "2008-02-15/03-14"
+        result = ISODateParser(input).components
+        self.assertEqual(result["start"]["year"], 2008)
+        self.assertEqual(result["start"]["month"], 2)
+        self.assertEqual(result["start"]["day"], 15)
+        self.assertEqual(result["end"]["month"], 3)
+        self.assertEqual(result["end"]["day"], 14)
+
+    def testDateOmitted(self):
+        input = "2018-03-01T05:06/07:08"
+        result = ISODateParser(input).components
+        self.assertEqual(result["start"]["year"], 2018)
+        self.assertEqual(result["start"]["month"], 3)
+        self.assertEqual(result["start"]["day"], 1)
+        self.assertEqual(result["end"]["hours"], 7)
+        self.assertEqual(result["end"]["minutes"], 8)
+
+    def testDateOmitted2(self):
+        input = "2018-03-01T05:06/T07:08"
+        result = ISODateParser(input).components
+        self.assertEqual(result["start"]["year"], 2018)
+        self.assertEqual(result["start"]["month"], 3)
+        self.assertEqual(result["start"]["day"], 1)
+        self.assertEqual(result["end"]["hours"], 7)
+        self.assertEqual(result["end"]["minutes"], 8)
+
 if __name__ == "__main__":
     unittest.main()
