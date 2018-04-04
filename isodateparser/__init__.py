@@ -73,6 +73,9 @@ class ISODateParser(object):
 
     def _parseDateTime(self, tokens):
         self._logger.debug("Parse datetime: " + self._printTokensShort(tokens))
+
+        # todo: detect when first part of datetime has been omitted
+
         buffer = list()
         time = False
         for token in tokens:
