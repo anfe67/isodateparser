@@ -73,9 +73,6 @@ class ISODateParser(object):
 
     def _parseDateTime(self, tokens):
         self._logger.debug("Parse datetime: " + self._printTokensShort(tokens))
-
-        # todo: detect when first part of datetime has been omitted
-
         buffer = list()
         time = False
         for token in tokens:
@@ -97,6 +94,8 @@ class ISODateParser(object):
         state = 0
         for token in tokens:
             if token.type == "NUMBER":
+                if (state == 0 and len(token.value) != 4):
+                    state = 1
                 if (state == 0):
                     self.components[self._which]["year"] = int(token.value)
                     state += 1
@@ -105,7 +104,7 @@ class ISODateParser(object):
                     state += 1
                 elif (state == 2):
                     self.components[self._which]["day"] = int(token.value)
-        if self.components[self._which]["year"] is None:
+        if self._which == "start" and self.components[self._which]["year"] is None:
             raise ValueError("No year in date")
 
     def _parseTimeTimezone(self, tokens):
