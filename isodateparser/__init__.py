@@ -135,6 +135,8 @@ class ISODateParser(object):
                     state += 1
                 elif (state == 2):
                     self.components[self._which]["seconds"] = int(token.value)
+            elif token.type != "TIMESEPARATOR":
+                raise ValueError("Time includes unexpected character " + token.value)
 
     def _parseTimezone(self, tokens):
         self._logger.debug("Parse timezone: " + self._printTokensShort(tokens))

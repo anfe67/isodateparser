@@ -184,5 +184,10 @@ class Test(unittest.TestCase):
         self.assertEqual(result["end"]["hours"], 7)
         self.assertEqual(result["end"]["minutes"], 8)
 
+    def testTimeMissing(self):
+        input = "1981-06-01+00:00"
+        with self.assertRaises(ValueError):
+            ISODateParser(input).dates
+
 if __name__ == "__main__":
     unittest.main()

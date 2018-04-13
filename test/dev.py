@@ -24,8 +24,9 @@ logging.basicConfig(level=logging.DEBUG)
 #input = "1990"
 #input = "--"
 #input = "2018-03-01T05:06/07:08"
-input = "2008-02-15/03-14"
+#input = "2008-02-15/03-14"
 #input = "2018-03-01T05:06/T07:08"
+input = "1981-06-01+00:00"
 
 parser = ISODateParser(input)
 sleep(0.5)
