@@ -128,12 +128,18 @@ class ISODateParser(object):
         for token in tokens:
             if token.type == "NUMBER":
                 if (state == 0):
+                    if int(token.value) > 23:
+                        raise ValueError("Impossible hours value: " + token.value)
                     self.components[self._which]["hours"] = int(token.value)
                     state += 1
                 elif (state == 1):
+                    if int(token.value) > 59:
+                        raise ValueError("Impossible minutes value: " + token.value)
                     self.components[self._which]["minutes"] = int(token.value)
                     state += 1
                 elif (state == 2):
+                    if int(token.value) > 59:
+                        raise ValueError("Impossible seconds value: " + token.value)
                     self.components[self._which]["seconds"] = int(token.value)
             elif token.type != "TIMESEPARATOR":
                 raise ValueError("Time includes unexpected character " + token.value)

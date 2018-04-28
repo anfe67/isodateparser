@@ -189,5 +189,11 @@ class Test(unittest.TestCase):
         with self.assertRaises(ValueError):
             ISODateParser(input).dates
 
+    def testImpossibleTimeValues(self):
+        inputs = ["2018-01-01T25:01:01", "2018-01-01T01:65:01", "2018-01-01T01:01:65"]
+        for input in inputs:
+            with self.assertRaises(ValueError):
+                ISODateParser(input).dates
+
 if __name__ == "__main__":
     unittest.main()

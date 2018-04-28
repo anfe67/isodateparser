@@ -5,6 +5,6 @@ setup(
     description="Parse ISO 8601 strings",
     author="Pieter Provoost",
     author_email="pieterprovoost@gmail.com",
-    version="0.1.3",
+    version="0.1.4",
     packages=["isodateparser"]
 )
