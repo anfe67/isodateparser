@@ -91,21 +91,42 @@ class ISODateParser(object):
 
     def _parseDate(self, tokens):
         self._logger.debug("Parse date: " + self._printTokensShort(tokens))
-        state = 0
+
+        numbers = []
+
         for token in tokens:
             if token.type == "NUMBER":
-                if (state == 0 and len(token.value) != 4):
-                    state = 1
-                if (state == 0):
-                    self.components[self._which]["year"] = int(token.value)
-                    state += 1
-                elif (state == 1):
-                    self.components[self._which]["month"] = int(token.value)
-                    state += 1
-                elif (state == 2):
-                    self.components[self._which]["day"] = int(token.value)
-        if self._which == "start" and self.components[self._which]["year"] is None:
+                numbers.append(token.value)
+
+        if self._which == "start" and len(numbers) == 0:
             raise ValueError("No year in date")
+
+        state = 0
+        if self._which == "end":
+            if self.components["start"]["day"] is not None:
+                if len(numbers) == 3:
+                    state = 0
+                elif len(numbers) == 2:
+                    state = 1
+                elif len(numbers) == 1:
+                    state = 2
+            elif self.components["start"]["month"] is not None:
+                if len(numbers) == 2:
+                    state = 0
+                elif len(numbers) == 1:
+                    state = 1
+
+        for number in numbers:
+            if (state == 0):
+                if len(number) != 4:
+                    raise ValueError("No year in date")
+                self.components[self._which]["year"] = int(number)
+                state += 1
+            elif (state == 1):
+                self.components[self._which]["month"] = int(number)
+                state += 1
+            elif (state == 2):
+                self.components[self._which]["day"] = int(number)
 
     def _parseTimeTimezone(self, tokens):
         self._logger.debug("Parse time and timezone: " + self._printTokensShort(tokens))
@@ -244,28 +265,40 @@ class ISODateParser(object):
     def _printTokensShort(self, tokens):
         return "".join([token.value for token in tokens])
 
-    def _startDate(self, components):
-        if components["year"] is not None:
-            year = components["year"]
+    def _startDate(self):
+        year = self.components["start"]["year"]
+        if "month" in self.components["start"] and self.components["start"]["month"] is not None:
+            month = self.components["start"]["month"]
         else:
-            return None
-        month = components["month"] if "month" in components and components["month"] is not None else 1
-        day = components["day"] if "day" in components and components["day"] is not None else 1
+            month = 1
+        if "day" in self.components["start"] and self.components["start"]["day"] is not None:
+            day = self.components["start"]["day"]
+        else:
+            day = 1
         return datetime.date(year, month, day)
 
-    def _endDate(self, components):
-        if components["year"] is not None:
-            year = components["year"]
+    def _endDate(self):
+        if "year" in self.components["end"] and self.components["end"]["year"] is not None:
+            year = self.components["end"]["year"]
         else:
-            return None
-        month = components["month"] if "month" in components and components["month"] is not None else 12
-        day = components["day"] if "day" in components and components["day"] is not None else calendar.monthrange(year, month)[1]
+            year = self.components["start"]["year"]
+        if "month" in self.components["end"] and self.components["end"]["month"] is not None:
+            month = self.components["end"]["month"]
+        elif "month" in self.components["start"] and self.components["start"]["month"] is not None:
+            month = self.components["start"]["month"]
+        else:
+            month = 12
+        if "day" in self.components["end"] and self.components["end"]["day"] is not None:
+            day = self.components["end"]["day"]
+        elif "day" in self.components["start"] and self.components["start"]["day"] is not None:
+            day = self.components["start"]["day"]
+        else:
+            day = calendar.monthrange(year, month)[1]
         return datetime.date(year, month, day)
 
     def _makeDates(self):
-        self.dates["start"] = self._startDate(self.components["start"])
-        end = self._endDate(self.components["end"])
-        self.dates["end"] = end if end is not None else self._endDate(self.components["start"])
+        self.dates["start"] = self._startDate()
+        self.dates["end"] = self._endDate()
         self.dates["mid"] = self.dates["start"] + (self.dates["end"] - self.dates["start"]) / 2
 
     def components(self):

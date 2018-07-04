@@ -195,5 +195,17 @@ class Test(unittest.TestCase):
             with self.assertRaises(ValueError):
                 ISODateParser(input).dates
 
+    def testEndDay(self):
+        input = "1973-06-18/26"
+        parser = ISODateParser(input)
+        result = parser.components
+        self.assertEqual(result["start"]["year"], 1973)
+        self.assertEqual(result["start"]["month"], 6)
+        self.assertEqual(result["start"]["day"], 18)
+        self.assertEqual(result["end"]["day"], 26)
+        dates = parser.dates
+        self.assertEqual(dates["start"], datetime.date(1973, 6, 18))
+        self.assertEqual(dates["end"], datetime.date(1973, 6, 26))
+
 if __name__ == "__main__":
     unittest.main()
