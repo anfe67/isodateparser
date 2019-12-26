@@ -1,6 +1,7 @@
-**/.DS_Store
-**/build
-**/dist
-**/isodateparser.egg-info
-**/.idea
-**/*.pyc
+dev.py
+.DS_Store
+build
+dist
+isodateparser.egg-info
+.idea
+*.pyc
