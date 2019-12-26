@@ -12,8 +12,8 @@ class Test(unittest.TestCase):
         logging.disable(logging.CRITICAL)
 
     def testSimpleDate(self):
-        input = "1990-01-02"
-        result = ISODateParser(input).components
+        text = "1990-01-02"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 1990)
         self.assertEqual(result["start"]["month"], 1)
         self.assertEqual(result["start"]["day"], 2)
@@ -30,8 +30,8 @@ class Test(unittest.TestCase):
         self.assertEqual(result["end"]["timezone"], None)
 
     def testSimpleDateTime(self):
-        input = "1990-01-02T12:13:14"
-        result = ISODateParser(input).components
+        text = "1990-01-02T12:13:14"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 1990)
         self.assertEqual(result["start"]["month"], 1)
         self.assertEqual(result["start"]["day"], 2)
@@ -41,8 +41,8 @@ class Test(unittest.TestCase):
         self.assertEqual(result["start"]["timezone"], None)
 
     def testSimpleDateTimeSpace(self):
-        input = "1990-01-02 12:13:14"
-        result = ISODateParser(input).components
+        text = "1990-01-02 12:13:14"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 1990)
         self.assertEqual(result["start"]["month"], 1)
         self.assertEqual(result["start"]["day"], 2)
@@ -52,8 +52,8 @@ class Test(unittest.TestCase):
         self.assertEqual(result["start"]["timezone"], None)
 
     def testDateRangeTimeZone(self):
-        input = "1990-01-02T03:04:05/2014-05-06 07:08+0900"
-        result = ISODateParser(input).components
+        text = "1990-01-02T03:04:05/2014-05-06 07:08+0900"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 1990)
         self.assertEqual(result["start"]["month"], 1)
         self.assertEqual(result["start"]["day"], 2)
@@ -70,8 +70,8 @@ class Test(unittest.TestCase):
         self.assertEqual(result["end"]["timezone"], 9)
 
     def testDateTimeUTC(self):
-        input = "2017-08-24T14:51:57Z"
-        result = ISODateParser(input).components
+        text = "2017-08-24T14:51:57Z"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 2017)
         self.assertEqual(result["start"]["month"], 8)
         self.assertEqual(result["start"]["day"], 24)
@@ -81,8 +81,8 @@ class Test(unittest.TestCase):
         self.assertEqual(result["start"]["timezone"], 0)
 
     def testTimeZoneWithSeparator(self):
-        input = "2010-01-02T03:04+06:30"
-        result = ISODateParser(input).components
+        text = "2010-01-02T03:04+06:30"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 2010)
         self.assertEqual(result["start"]["month"], 1)
         self.assertEqual(result["start"]["day"], 2)
@@ -91,8 +91,8 @@ class Test(unittest.TestCase):
         self.assertEqual(result["start"]["timezone"], 6.5)
 
     def testTimeZoneWithoutSeparator(self):
-        input = "2010-01-02T03:04+0630"
-        result = ISODateParser(input).components
+        text = "2010-01-02T03:04+0630"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 2010)
         self.assertEqual(result["start"]["month"], 1)
         self.assertEqual(result["start"]["day"], 2)
@@ -101,8 +101,8 @@ class Test(unittest.TestCase):
         self.assertEqual(result["start"]["timezone"], 6.5)
 
     def testNegativeTimeZoneWithSeparator(self):
-        input = "2010-01-02T03:04-06:30"
-        result = ISODateParser(input).components
+        text = "2010-01-02T03:04-06:30"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 2010)
         self.assertEqual(result["start"]["month"], 1)
         self.assertEqual(result["start"]["day"], 2)
@@ -111,8 +111,8 @@ class Test(unittest.TestCase):
         self.assertEqual(result["start"]["timezone"], -6.5)
 
     def testNegativeTimeZoneWithoutSeparator(self):
-        input = "2010-01-02T03:04-0630"
-        result = ISODateParser(input).components
+        text = "2010-01-02T03:04-0630"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 2010)
         self.assertEqual(result["start"]["month"], 1)
         self.assertEqual(result["start"]["day"], 2)
@@ -121,45 +121,45 @@ class Test(unittest.TestCase):
         self.assertEqual(result["start"]["timezone"], -6.5)
 
     def testMonthRange(self):
-        input = "2010-01/2012-05"
-        result = ISODateParser(input).components
+        text = "2010-01/2012-05"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 2010)
         self.assertEqual(result["start"]["month"], 1)
         self.assertEqual(result["end"]["year"], 2012)
         self.assertEqual(result["end"]["month"], 5)
 
     def testDates(self):
-        input = "1990-01/2014-05"
-        result = ISODateParser(input).dates
+        text = "1990-01/2014-05"
+        result = ISODateParser(text).dates
         self.assertEqual(result["start"], datetime.date(1990, 1, 1))
-        self.assertEqual(result["end"], datetime.date(2014, 05, 31))
+        self.assertEqual(result["end"], datetime.date(2014, 5, 31))
 
     def testDatesOnlyStart(self):
-        input = "1990-01-02"
-        result = ISODateParser(input).dates
+        text = "1990-01-02"
+        result = ISODateParser(text).dates
         self.assertEqual(result["start"], datetime.date(1990, 1, 2))
         self.assertEqual(result["end"], datetime.date(1990, 1, 2))
         self.assertEqual(result["mid"], datetime.date(1990, 1, 2))
 
     def testDatesOnlyMonth(self):
-        input = "1990-01"
-        result = ISODateParser(input).dates
+        text = "1990-01"
+        result = ISODateParser(text).dates
         self.assertEqual(result["start"], datetime.date(1990, 1, 1))
         self.assertEqual(result["end"], datetime.date(1990, 1, 31))
 
     def testBackSlash(self):
-        input = "2003-04-30T12:00\\2003-04-30T17:30"
+        text = "2003-04-30T12:00\\2003-04-30T17:30"
         with self.assertRaises(ValueError):
-            ISODateParser(input).dates
+            ISODateParser(text).dates
 
     def testDashes(self):
-        input = "--"
+        text = "--"
         with self.assertRaises(ValueError):
-            ISODateParser(input).dates
+            ISODateParser(text).dates
 
     def testYearOmitted(self):
-        input = "2008-02-15/03-14"
-        result = ISODateParser(input).components
+        text = "2008-02-15/03-14"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 2008)
         self.assertEqual(result["start"]["month"], 2)
         self.assertEqual(result["start"]["day"], 15)
@@ -167,8 +167,8 @@ class Test(unittest.TestCase):
         self.assertEqual(result["end"]["day"], 14)
 
     def testDateOmitted(self):
-        input = "2018-03-01T05:06/07:08"
-        result = ISODateParser(input).components
+        text = "2018-03-01T05:06/07:08"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 2018)
         self.assertEqual(result["start"]["month"], 3)
         self.assertEqual(result["start"]["day"], 1)
@@ -176,8 +176,8 @@ class Test(unittest.TestCase):
         self.assertEqual(result["end"]["minutes"], 8)
 
     def testDateOmitted2(self):
-        input = "2018-03-01T05:06/T07:08"
-        result = ISODateParser(input).components
+        text = "2018-03-01T05:06/T07:08"
+        result = ISODateParser(text).components
         self.assertEqual(result["start"]["year"], 2018)
         self.assertEqual(result["start"]["month"], 3)
         self.assertEqual(result["start"]["day"], 1)
@@ -185,19 +185,19 @@ class Test(unittest.TestCase):
         self.assertEqual(result["end"]["minutes"], 8)
 
     def testTimeMissing(self):
-        input = "1981-06-01+00:00"
+        text = "1981-06-01+00:00"
         with self.assertRaises(ValueError):
-            ISODateParser(input).dates
+            ISODateParser(text).dates
 
     def testImpossibleTimeValues(self):
-        inputs = ["2018-01-01T25:01:01", "2018-01-01T01:65:01", "2018-01-01T01:01:65"]
-        for input in inputs:
+        texts = ["2018-01-01T25:01:01", "2018-01-01T01:65:01", "2018-01-01T01:01:65"]
+        for text in texts:
             with self.assertRaises(ValueError):
-                ISODateParser(input).dates
+                ISODateParser(text).dates
 
     def testEndDay(self):
-        input = "1973-06-18/26"
-        parser = ISODateParser(input)
+        text = "1973-06-18/26"
+        parser = ISODateParser(text)
         result = parser.components
         self.assertEqual(result["start"]["year"], 1973)
         self.assertEqual(result["start"]["month"], 6)

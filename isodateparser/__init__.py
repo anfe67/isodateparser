@@ -11,7 +11,7 @@ class Token(object):
 
 class ISODateParser(object):
 
-    def __init__(self, input):
+    def __init__(self, text):
         self._logger = logging.getLogger(__name__)
 
         self.dates = {
@@ -42,55 +42,55 @@ class ISODateParser(object):
             }
         }
         self._which = "start"
-        self._input = input
+        self._input = text
         self._tokenize()
         self._disambiguate()
-        self._logger.debug(self._printTokens(self._tokens))
+        self._logger.debug(self._print_tokens(self._tokens))
         self._parse()
-        self._makeDates()
+        self._make_dates()
 
     def _parse(self):
-        self._logger.debug("Parse input: " + self._printTokensShort(self._tokens))
+        self._logger.debug("Parse input: " + self._print_tokens_short(self._tokens))
         buffer = list()
         for token in self._tokens:
             if token.type == "INTERVALSEPARATOR":
-                self._parsePart(buffer)
+                self._parse_part(buffer)
                 buffer = list()
                 self._which = "end"
             else:
                 buffer.append(token)
-        self._parsePart(buffer)
+        self._parse_part(buffer)
 
-    def _parsePart(self, tokens):
-        self._logger.debug("Parse part: " + self._printTokensShort(tokens))
+    def _parse_part(self, tokens):
+        self._logger.debug("Parse part: " + self._print_tokens_short(tokens))
         for token in tokens:
             if token.type == "DATESEPARATOR" or token.type == "TIMESEPARATOR":
-                return self._parseDateTime(tokens)
+                return self._parse_date_time(tokens)
             elif token.type == "DESIGNATOR":
-                return self._parseDuration(tokens)
+                return self._parse_duration(tokens)
         # not separator, assuming year only
-        return self._parseDateTime(tokens)
+        return self._parse_date_time(tokens)
 
-    def _parseDateTime(self, tokens):
-        self._logger.debug("Parse datetime: " + self._printTokensShort(tokens))
+    def _parse_date_time(self, tokens):
+        self._logger.debug("Parse datetime: " + self._print_tokens_short(tokens))
         buffer = list()
         time = False
         for token in tokens:
             if token.type == "DATETIMESEPARATOR":
-                self._parseDate(buffer)
+                self._parse_date(buffer)
                 time = True
                 buffer = list()
             else:
                 if token.type == "TIMESEPARATOR":
                     time = True
                 buffer.append(token)
-        if (time):
-            self._parseTimeTimezone(buffer)
+        if time:
+            self._parse_time_timezone(buffer)
         else:
-            self._parseDate(buffer)
+            self._parse_date(buffer)
 
-    def _parseDate(self, tokens):
-        self._logger.debug("Parse date: " + self._printTokensShort(tokens))
+    def _parse_date(self, tokens):
+        self._logger.debug("Parse date: " + self._print_tokens_short(tokens))
 
         numbers = []
 
@@ -117,56 +117,56 @@ class ISODateParser(object):
                     state = 1
 
         for number in numbers:
-            if (state == 0):
+            if state == 0:
                 if len(number) != 4:
                     raise ValueError("No year in date")
                 self.components[self._which]["year"] = int(number)
                 state += 1
-            elif (state == 1):
+            elif state == 1:
                 self.components[self._which]["month"] = int(number)
                 state += 1
-            elif (state == 2):
+            elif state == 2:
                 self.components[self._which]["day"] = int(number)
 
-    def _parseTimeTimezone(self, tokens):
-        self._logger.debug("Parse time and timezone: " + self._printTokensShort(tokens))
+    def _parse_time_timezone(self, tokens):
+        self._logger.debug("Parse time and timezone: " + self._print_tokens_short(tokens))
         buffer = list()
         timezone = False
         for token in tokens:
             if token.type == "TIMEZONESIGN" or token.type == "UTC":
-                self._parseTime(buffer)
+                self._parse_time(buffer)
                 timezone = True
                 buffer = list()
             buffer.append(token)
-        if (timezone):
-            self._parseTimezone(buffer)
+        if timezone:
+            self._parse_timezone(buffer)
         else:
-            self._parseTime(buffer)
+            self._parse_time(buffer)
 
-    def _parseTime(self, tokens):
-        self._logger.debug("Parse time: " + self._printTokensShort(tokens))
+    def _parse_time(self, tokens):
+        self._logger.debug("Parse time: " + self._print_tokens_short(tokens))
         state = 0
         for token in tokens:
             if token.type == "NUMBER":
-                if (state == 0):
+                if state == 0:
                     if int(token.value) > 23:
                         raise ValueError("Impossible hours value: " + token.value)
                     self.components[self._which]["hours"] = int(token.value)
                     state += 1
-                elif (state == 1):
+                elif state == 1:
                     if int(token.value) > 59:
                         raise ValueError("Impossible minutes value: " + token.value)
                     self.components[self._which]["minutes"] = int(token.value)
                     state += 1
-                elif (state == 2):
+                elif state == 2:
                     if int(token.value) > 59:
                         raise ValueError("Impossible seconds value: " + token.value)
                     self.components[self._which]["seconds"] = int(token.value)
             elif token.type != "TIMESEPARATOR":
                 raise ValueError("Time includes unexpected character " + token.value)
 
-    def _parseTimezone(self, tokens):
-        self._logger.debug("Parse timezone: " + self._printTokensShort(tokens))
+    def _parse_timezone(self, tokens):
+        self._logger.debug("Parse timezone: " + self._print_tokens_short(tokens))
         state = 0
         hours = None
         minutes = 0.0
@@ -189,8 +189,8 @@ class ISODateParser(object):
         if hours is not None:
             self.components[self._which]["timezone"] = sign * (hours + minutes / 60.0)
 
-    def _parseDuration(self, tokens):
-        self._logger.debug("Parse duration: " + self._printTokensShort(tokens))
+    def _parse_duration(self, tokens):
+        self._logger.debug("Parse duration: " + self._print_tokens_short(tokens))
         pass
 
     def _tokenize(self):
@@ -249,11 +249,11 @@ class ISODateParser(object):
     def __str__(self):
         lines = list()
         lines.append("Input: " + self._input)
-        lines.append(self._printTokens(self._tokens))
+        lines.append(self._print_tokens(self._tokens))
         lines.append(json.dumps(self.components))
         return "\n".join(lines)
 
-    def _printTokens(self, tokens):
+    def _print_tokens(self, tokens):
         lines = list()
         for token in tokens:
             line = token.type
@@ -262,10 +262,10 @@ class ISODateParser(object):
             lines.append(line)
         return "\n".join(lines)
 
-    def _printTokensShort(self, tokens):
+    def _print_tokens_short(self, tokens):
         return "".join([token.value for token in tokens])
 
-    def _startDate(self):
+    def _start_date(self):
         year = self.components["start"]["year"]
         if "month" in self.components["start"] and self.components["start"]["month"] is not None:
             month = self.components["start"]["month"]
@@ -277,7 +277,7 @@ class ISODateParser(object):
             day = 1
         return datetime.date(year, month, day)
 
-    def _endDate(self):
+    def _end_date(self):
         if "year" in self.components["end"] and self.components["end"]["year"] is not None:
             year = self.components["end"]["year"]
         else:
@@ -296,9 +296,9 @@ class ISODateParser(object):
             day = calendar.monthrange(year, month)[1]
         return datetime.date(year, month, day)
 
-    def _makeDates(self):
-        self.dates["start"] = self._startDate()
-        self.dates["end"] = self._endDate()
+    def _make_dates(self):
+        self.dates["start"] = self._start_date()
+        self.dates["end"] = self._end_date()
         self.dates["mid"] = self.dates["start"] + (self.dates["end"] - self.dates["start"]) / 2
 
     def components(self):
