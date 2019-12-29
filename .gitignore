@@ -1,3 +1,4 @@
+*.pdf
 dev.py
 .DS_Store
 build
